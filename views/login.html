@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+        integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous" />
+    <title>Login Page</title>
+    <style>
+        body{
+            font-size:large;
+            background-color:burlywood;
+        }
+
+        .container{
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn{
+            margin-top: 10px;
+            background-color: rgba(151, 184, 173, 0.795);
+        }
+
+        .btn:hover{
+            background-color: azure;
+        }
+
+        .navbar{
+            background-color: cornsilk;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <a href="#" class="navbar-brand-lg"><h1 style="color: #454a8ccf;">Daily Expenses</h1></a>
+    </nav>
+
+    <div id="main" class="container">
+        <form id="loginform" method="POST" action="http://localhost:7000/user/login" onsubmit="login(event)">
+            <div class="form-floating">
+                <label for="email">Email Id: </label>
+                <input type="email" name="emailid" id="emailid" required> 
+            </div>
+
+            <div class="form-floating">
+                <label for="pass">Password: </label>
+                <input type="password" name="passid" id="passid" required>
+            </div>
+
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <button class="btn" id="forgotpsw">Forgot Password?</button>
+        
+    </div>
+
+    <div class="container">
+        <a href="http://localhost:7000/user/signup">New User: Sign Up</a>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        async function login(event){
+            event.preventDefault();
+            try{
+                const emailId = document.getElementById('emailid').value;
+                const passId = document.getElementById('passid').value;
+
+                const user = {
+                    emailId: emailId,
+                    passId: passId
+                };
+
+                axios.post("http://localhost:7000/user/login", user).then(response => {
+                    alert(response.data.message);
+                    localStorage.setItem('token', response.data.token);
+                    window.location.href = "http://localhost:7000/expense/dashboard";
+                });
+
+                // console.log(res);
+                // alert('User login successfully');
+                
+                document.getElementById('emailid').value = '';
+                document.getElementById('passid').value = '';
+            } catch(error) {
+                if(error.response && error.response.status === 404){ 
+                    alert('Email id does not exists');
+                    document.getElementById('emailid').value = '';
+                    document.getElementById('passid').value = '';
+                } else if(error.response && error.response.status === 401){
+                    alert('User not authorized');
+                    document.getElementById('emailid').value = '';
+                    document.getElementById('passid').value = '';
+                }
+                else{
+                    document.body.innerHTML += "<h4>Something went wrong</h4>";
+                    console.log(error);
+                }
+            }
+            
+
+
+        }
+
+        document.getElementById('forgotpsw').onclick = async function () {
+            try{
+                window.location.href = 'http://localhost:7000/password/forgotForm';
+                console.log('redirecting to forgotForm.html');
+            } catch(err){
+                console.log('error in redirecting to forgotForm.html', err);
+            }
+            
+        }
+    </script>
+</body>
+</html>

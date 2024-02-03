@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+        integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous" />
+
+    <title>Sign Up Page</title>
+
+    <style>
+        body{
+            font-size:large;
+            background-color:burlywood;
+        }
+
+        .container{
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn{
+            margin-top: 10px;
+            background-color: rgba(151, 184, 173, 0.795);
+        }
+
+        .btn:hover{
+            background-color: azure;
+        }
+
+        .navbar{
+            background-color: cornsilk;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <a href="#" class="navbar-brand-lg"><h1 style="color: #454a8ccf;">Daily Expenses</h1></a>
+    </nav>
+    <div id="main" class="container">
+        <form id="signup-form" action="http://localhost:7000/user/signup" method="POST" onsubmit="signUp(event)">
+            <div class="form-floating">
+                <label for="uname">Enter Username: </label>
+                <input type="text" class="mr-2 mb-2 mt-2" name="uname" id="username" required>
+            </div>
+            
+            <div class="form-floating">
+                <label for="email">Enter E-mail: </label>
+                <input type="email" class="mr-2 mb-2 mt-2" name="email" id="emailid" required>
+            </div>
+            
+            <div class="form-floating">
+                <label for="psw">Enter Password: </label>
+                <input type="password" class="mr-2 mb-2 mt-2" name="psw" id="passid" required>
+            </div>
+            
+            <button type="submit" class="btn">Sign Up</button>
+        </form>
+    </div>
+    
+    <div class="container">
+        <a href="http://localhost:7000/user/login">Existing user: Login</a>
+    </div>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        async function signUp(event){
+            try{
+                event.preventDefault();
+
+                const username = document.getElementById('username').value;
+                const emailId = document.getElementById('emailid').value;
+                const passId = document.getElementById('passid').value;
+
+                const user = {
+                    username: username,
+                    emailId: emailId,
+                    passId: passId
+                };
+
+                const res =  await axios.post("http://localhost:7000/user/signup", user);
+
+                console.log(res);
+
+                document.getElementById('username').value = '';
+                document.getElementById('emailid').value = '';
+                document.getElementById('passid').value = '';
+
+                alert('User signed up successfully');
+
+            } catch (error) {
+                if(error.response && error.response.status === 400){
+
+                    
+                    document.body.innerHTML += "<p>Email is already in use. Try using different emailId</p>";
+                }
+                else{
+                    document.body.innerHTML += "<h4>Something went wrong</h4>";
+                    console.log(error);
+                }
+                
+            }
+
+        }
+    </script>
+</body>
+</html>

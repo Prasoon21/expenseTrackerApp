@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+        integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous" />
+    <title>forgot password page</title>
+    <style>
+        body{
+            font-size:large;
+            background-color:burlywood;
+        }
+
+        .container{
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn{
+            margin-top: 10px;
+            background-color: rgba(151, 184, 173, 0.795);
+        }
+
+        .btn:hover{
+            background-color: azure;
+        }
+
+        .navbar{
+            background-color: cornsilk;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <a href="#" class="navbar-brand-lg"><h1 style="color: #454a8ccf;">Daily Expenses</h1></a>
+    </nav>
+    <div id="email-div" class="container">
+        <form id="emailform" method="POST" action="http://localhost:7000/password/forgotpassword" onsubmit="forgotpsw(event)">
+            <label for="emailId">Enter your Email-id</label>
+            <input type="text" name="emailId" id="emailId" required>
+            <button type="submit">Submit</button>
+    
+        </form>
+    </div>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        async function forgotpsw(event){
+            event.preventDefault();
+            try{
+                const emailId = document.getElementById('emailId').value;
+                console.log('entered email for forgot password', emailId);
+
+                const response = await axios.post('http://localhost:7000/password/forgotpassword', {
+                    emailId
+                });
+
+                // Handle the response if needed
+                console.log('API Response:', response.data);
+                document.getElementById('emailId').value = '';
+                
+            } catch(err){
+                console.log('something wrong in submitting mail', err)
+
+            }
+        }
+
+    </script>
+</body>
+</html>

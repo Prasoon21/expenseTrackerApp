@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Details</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <style>
+        body{
+            background-color:khaki;
+        }
+        
+        .navbar{
+            background-color: cornsilk;
+        }
+        .firsthead{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <a href="#" class="navbar-brand-lg"><h1 style="color: #454a8ccf;">Daily Expenses</h1></a>
+        <button class="btn btn-dark" id="logout">Log Out</button>
+    </nav>
+    <h1 class="firsthead">Day to Day Expenses</h1>
+    <div class="container">
+        <div class="filters">
+            <button onclick="showDaily()">Daily</button>
+            <button onclick="showWeekly()">Weekly</button>
+            <button onclick="showMonthly()">Monthly</button>
+        </div>
+        
+        
+        <table id="expenseTable" class="table table-striped mt-2">
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Description</th>
+                <th scope="col">Category</th>
+                <th scope="col">Income</th>
+                <th scope="col">Amount</th>
+            </tr>
+            
+            
+        </table>
+        
+        
+        <button id="downloadButton" onclick="downloadData()" disabled>Download Expenses</button>
+    
+    </div>
+</body>
+</html>
