@@ -9,11 +9,13 @@
 
 const mongo = require('mongodb');
 const mongoClient = mongo.MongoClient;
+let _db;
 
 const mongoConnect = (callback) => {
     mongoClient.connect('mongodb+srv://prasoon-21:tiAHPUTFYHBhVNpE@cluster0.xqhgxxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
     .then((client) => {
-        callback(client);
+        _db = client.db();
+        callback();
         console.log("Connected!");
     })
     .catch((err) => {
@@ -21,4 +23,12 @@ const mongoConnect = (callback) => {
     })
 }
 
-module.exports = mongoConnect;
+const getDb = function(){
+    if(_db){
+        return _db;
+    }
+    throw "No Database found";
+}
+
+exports.mongoConnect = mongoConnect;
+exports.getDb = getDb;
