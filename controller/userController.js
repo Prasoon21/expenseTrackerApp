@@ -22,7 +22,8 @@ exports.loginUser = async (req, res, next) => {
             return res.status(400).json({ error: "EmailId is missing", message: "EmailId is missing" });
         }
         
-        const user = await User.findAll({ where: { emailId }});
+        const user = await User.findOne(emailId);
+        
 
         // const existingUser = await User.findOne({ 
         //     where: { emailId: emailId }
@@ -67,6 +68,14 @@ exports.postUser = async (req, res, next) => {
         const {username, emailId, passId } = req.body;
         //console.log(req.body);
 
+        // const user = new User(username, emailId, passId);
+        // user.save().then((res) => {
+        //     console.log(res);
+        // }).catch((err) => {
+        //     console.log(err);
+        // })
+
+        
         const existingUser = await User.findOne({ 
             where: { emailId: emailId }
         });
@@ -78,11 +87,13 @@ exports.postUser = async (req, res, next) => {
     
         bcrypt.hash(passId, 10, async (err, hash) => {
             console.log(err);
-            await User.create({
-                username: username,
-                emailId: emailId,
-                passId: hash
-            });
+            // await User.create({
+            //     username: username,
+            //     emailId: emailId,
+            //     passId: hash
+            // });
+            const newUser = new User(username, emailId, hash);
+            console.log("New user created : ", newUser);
             res.status(201).json({message: 'Successfully Create new user'});
         })
         

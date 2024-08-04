@@ -121,19 +121,34 @@ exports.addExpense= async (req,res,next)=>
     
         console.log(amount,description,category);
 
-        const data=await Expense.create({
-            amount:amount,
-            description:description,
-            category:category,
-            userId:req.user.id,
-            
-            
-         });
-        //const expense = await Expense.create({ userId, amount, description, category });
-        //await t.commit();
-        console.log('updated success');
-    
-        res.status(201).json(data)
+        // const data=await Expense.create({
+        //     amount:amount,
+        //     description:description,
+        //     category:category,
+        //     userId:req.user.id,
+        //  });
+        // //const expense = await Expense.create({ userId, amount, description, category });
+        // //await t.commit();
+        // console.log('updated success');
+
+        const expense = new Expense(amount, description, category);
+        expense.save().then((exp) => {
+            const totalExpense=
+        })
+        
+        // req.user.createExpense(expense).then(async (response) => {
+        //     const  total_expense= +req.user.totalExpense+ +amount;
+        //     req.user.totalExpense=total_expense;
+        //     await req.user.save();
+        // //    await t.commit();
+        //     console.log(response);
+        //     res.json(response);
+        // }).catch((err) => {
+        //     //    t.rollback();
+        //         console.error(err)
+        // });
+        // const 
+        res.status(201).json(expense)
     } catch (error) {
         //await t.rollback()
         console.log(error,JSON.stringify(error))

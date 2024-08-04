@@ -1,3 +1,28 @@
+const getDb = require('../util/database').getDb;
+class Expense{
+    constructor(amount, description, category){
+        this.amount = amount;
+        this.description = description;
+        this.category = category;
+    }
+
+    save(){
+        const db = getDb();
+        return db.collection('expense')
+            .insertOne(this)
+            .then((result) => {
+                console.log(result)
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+}
+
+module.exports = Expense;
+
+
+
 // const Sequelize = require('sequelize');
 
 // const sequelize = require('../util/database');
@@ -28,6 +53,3 @@
 // });
 
 // module.exports = Expense;
-
-
-

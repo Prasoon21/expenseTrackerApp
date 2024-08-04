@@ -18,7 +18,7 @@ const premiumRoute = require('./routes/premiumRoute');
 const resetpasswordRoute = require('./routes/resetpassword'); 
 
 //const sequelize = require('./util/database');
-const mongoConnect = require('./util/database');
+const mongoConnect = require('./util/database').mongoConnect;
 
 
 const User = require('./model/userData');
@@ -74,8 +74,7 @@ app.use('/password', resetpasswordRoute);
 //     })
 //     .catch(err => console.log(err))
 
-mongoConnect((client) => {
-    console.log('client: ', client);
+mongoConnect(() => {
     app.listen(process.env.PORT || 7000, () => {
         console.log('Server is running on port: ', process.env.PORT);
 
