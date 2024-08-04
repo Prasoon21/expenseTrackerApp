@@ -5,7 +5,7 @@ const sequelize = require('../util/database');
 const User = require('../model/userData');
 const AWS = require('aws-sdk');
 const FilesDownloaded = require('../model/filesdownloaded');
-
+let userId = 0;
 
 
 function uploadToS3(data, filename){
@@ -71,27 +71,32 @@ exports.getExpense = async (req,res,next)=>{
         const filesData = await FilesDownloaded.findAll( {where: {userId: req.user.id }})
 
         totalItems = await Expense.count();
-        const expenses = await Expense.findAll({
-            offset: (page-1) * limit,
-            limit: limit,
-        });
+        const exp =  Expense.getExpense(req.user._id,
+            offset= (page-1) * limit,
+            limit= limit,
+        );
+
+        const totalExp = await Expense.countExpenses(req.user._id);
+        console.log("totalexp: ", totalExp);
 
         console.log('User ID:', req.user.id);
         console.log('Limit:', limit);
         console.log('Expenses:', expenses);
         console.log('Files Data:', filesData);
 
-        res.json({
-            expenses: expenses,
-            currentPage: page,
-            hasNextPage: limit * page < totalItems,
-            nextPage: page + 1,
-            hasPreviousPage: page > 1,
-            previousPage: page-1,
-            lastPage: Math.ceil(totalItems / limit),
-            filesData: filesData,
-            limit: limit
-        });
+        const [expenses, totalExpenses ] = await Promise.all([exp, totalExp])
+        return res.json({ expenses, totalExpenses});
+        // res.json({
+        //     expenses: expenses,
+        //     currentPage: page,
+        //     hasNextPage: limit * page < totalItems,
+        //     nextPage: page + 1,
+        //     hasPreviousPage: page > 1,
+        //     previousPage: page-1,
+        //     lastPage: Math.ceil(totalItems / limit),
+        //     filesData: filesData,
+        //     limit: limit
+        // });
     } catch(err){
         console.log(err);
         res.status(500).json({ error: 'Internal server error' });
@@ -131,23 +136,20 @@ exports.addExpense= async (req,res,next)=>
         // //await t.commit();
         // console.log('updated success');
 
-        const expense = new Expense(amount, description, category);
+        userId = req.user._id;
+        console.log(userId);
+        const expense = new Expense(req.user._id, amount, description, category);
         expense.save().then((exp) => {
-            const totalExpense=
+            const totalExpense= +req.user.totalExpense+ +exp.amount;
+            req.user.totalExpense = totalExpense;
+            req.user.save().then((res) => {
+                console.log("total expense: ", totalExpense);
+                console.log("done: ", res);
+            }).catch((err) => {
+                console.log("error", err);
+            })
         })
         
-        // req.user.createExpense(expense).then(async (response) => {
-        //     const  total_expense= +req.user.totalExpense+ +amount;
-        //     req.user.totalExpense=total_expense;
-        //     await req.user.save();
-        // //    await t.commit();
-        //     console.log(response);
-        //     res.json(response);
-        // }).catch((err) => {
-        //     //    t.rollback();
-        //         console.error(err)
-        // });
-        // const 
         res.status(201).json(expense)
     } catch (error) {
         //await t.rollback()
@@ -161,38 +163,41 @@ exports.addExpense= async (req,res,next)=>
 
 exports.deleteExpense= async (req,res,next)=>{
     try {
-        const t = await sequelize.transaction();
-        if(!req.params.id||req.params.id==='undefined')
-        {
-            console.log('ID is Missing');
-            return res.sendStatus(420)
-        }
-        const expenseId=req.params.id;
+        // const t = await sequelize.transaction();
+        // if(!req.params.id||req.params.id==='undefined')
+        // {
+        //     console.log('ID is Missing');
+        //     return res.sendStatus(420)
+        // }
+        // const expenseId=req.params.id;
         
-        const expense = await Expense.findByPk(expenseId, { transaction: t });
-        if(!expense){
-            console.log(`Expense with ID ${expenseId} not found`);
-            return res.sendStatus(404);
-        }
+        // const expense = await Expense.findByPk(expenseId, { transaction: t });
+        // if(!expense){
+        //     console.log(`Expense with ID ${expenseId} not found`);
+        //     return res.sendStatus(404);
+        // }
 
-        const userId = expense.userId;
-        const amount = expense.amount;
+        // const userId = expense.userId;
+        // const amount = expense.amount;
         
-        await Expense.destroy({where:{id:expenseId}, transaction: t })
+        // await Expense.destroy({where:{id:expenseId}, transaction: t })
 
-        const user = await User.findByPk(userId);
-        if(user){
-            user.total_expense -= amount;
-            await user.save();
-        }
-        await t.commit()
-
-        console.log(`Successfully deleted expense with ID ${expenseId}`);
-        res.sendStatus(200);
-        console.log(`sucessfully deleted ${expenseId}`);
+        // const user = await User.findByPk(userId);
+        // if(user){
+        //     user.total_expense -= amount;
+        //     await user.save();
+        // }
+        // await t.commit()
+        const expenseAmount = await Expense.getExpense(req.params.id);
+        const userTotalExpense = await User.findOne(req.params.id);
+        userTotalExpense.totalExpense = userTotalExpense.totalExpense - expenseAmount.amount;
+        Expense.destroy(req.params.id).then((response) => {
+            res.json({success: true, message:"deleted -> ", response})
+        }).catch((err) => {
+            console.log(err);
+        })
     } catch (error) {
         console.log(JSON.stringify(error));
-        await t.rollback();
         res.status(404).json({error})
         
     }

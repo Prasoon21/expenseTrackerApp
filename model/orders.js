@@ -15,3 +15,27 @@
 // })
 
 // module.exports = Order;
+
+const getDb = require('../util/database').getDb;
+const mongo = require('mongodb');
+class Order{
+    constructor(id, paymentId, orderId, status){
+        this.userId = id;
+        this.paymentId = paymentId;
+        this.orderId = orderId;
+        this.status = status;
+    }
+
+    save(){
+        const db = getDb();
+        return db.collection('order').insertOne(this).then((result) => {
+            console.log("result from order model: ", result);
+            return result;
+
+        }).catch((err) => {
+            console.log(err);
+        })
+    }
+}
+
+module.exports = Order;

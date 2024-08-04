@@ -76,9 +76,7 @@ exports.postUser = async (req, res, next) => {
         // })
 
         
-        const existingUser = await User.findOne({ 
-            where: { emailId: emailId }
-        });
+        const existingUser = await User.findOne(emailId);
         console.log('Existing User: ', existingUser);
         if (existingUser) {
             console.error("Email already in use");
@@ -94,14 +92,19 @@ exports.postUser = async (req, res, next) => {
             // });
             const newUser = new User(username, emailId, hash);
             console.log("New user created : ", newUser);
+            newUser.save().then((res) => {
+                console.log(res);
+            }).catch((err) => {
+                console.log(err);
+            })
             res.status(201).json({message: 'Successfully Create new user'});
         })
         
 
         
-        console.log('updated success');
-        //console.log("User Created Successfully ", data);
-        res.status(201);//.json(data);
+        // console.log('updated success');
+        // //console.log("User Created Successfully ", data);
+        // res.status(201);//.json(data);
         
     } catch(error) {
         console.error("Error Creating User: ", error);

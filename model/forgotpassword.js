@@ -13,3 +13,25 @@
 // })
 
 // module.exports = Forgotpassword;
+
+const getDb = require('../util/database').getDb;
+const mongo = require('mongodb');
+
+class FP{
+    constructor(id, isActive){
+        this.userId = id;
+        this.isActive = isActive;
+    }
+
+    save(){
+        const db = getDb();
+        return db.collection('fp').insertOne(this).then((result) => {
+            console.log("result: ", result);
+            return result;
+        }).catch((err) => {
+            console.log("error: ", err);
+        })
+    }
+}
+
+module.exports = FP;
