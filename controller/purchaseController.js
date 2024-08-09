@@ -1,6 +1,6 @@
-const Razorpay = require('razorpay');
-const Order = require('../model/orders');
-const loginController = require('./userController');
+import Razorpay from 'razorpay';
+import Order from '../model/orders';
+import loginController from './userController';
 
 exports.purchasepremium = async (req, res) => {
     try{
@@ -35,7 +35,7 @@ exports.updateTransactionStatus = async(req, res, next) => {
         const { payment_id, order_id, payment_status } = req.body;
         const userId = req.user.id
 
-        const order = await Order.findOne({ where: { orderid: order_id } });
+        const order = await Order.findOne(order_id);
 
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found" });

@@ -8,7 +8,6 @@ const ExpenseSchema = new mongoose.Schema({
     category: String
 })
 
-
 export const Expense = mongoose.model('expense', ExpenseSchema);
 
 //     save(){

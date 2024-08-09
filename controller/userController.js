@@ -1,10 +1,10 @@
-const path = require('path');
-const rootDir = require('../util/path');
-const bcrypt  = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const userController = require('./userController');
+import path from 'path';
+import rootDir from '../util/path';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import userController from './userController';
 let userId = 0;
-const User = require("../model/userData");
+import User from "../model/userData";
 
 exports.generateAccessToken = (id, name, ispremiumuser) => {
     return jwt.sign({ userId: id, name: name, ispremiumuser}, 'r@nd0mlyG3n3r@tedK3yW!thSpec!alCh@ract3rs');

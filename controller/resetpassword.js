@@ -4,8 +4,8 @@ const Sib = require('sib-api-v3-sdk');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
-const User = require('../model/userData');
-const Forgotpassword = require('../model/forgotpassword');
+import {User} from '../model/userData';
+import {FP} from '../model/forgotpassword';
 
 const forgotForm = async(req, res, next) => {
     try{
@@ -20,12 +20,10 @@ const forgotpassword = async(req, res, next) => {
     try{
         const emailId = req.body.emailId;
         console.log('entered email:', emailId);
-
-
-        const user = await User.findOne({where : { emailId }});
+        const user = await User.findOne(emailId);
         if(user){
             const id = uuid.v4();
-            user.createForgotpassword({ id, active: true })
+            user.createFP({ id, active: true })
                 .catch(err => {
                     throw new Error(err)
                 })
@@ -67,9 +65,6 @@ const forgotpassword = async(req, res, next) => {
             }).catch((error) => {
                 throw new Error(error);
             })
-        
-                
-            
         } else{
             throw new Error('User does not exist')
         }
@@ -77,13 +72,11 @@ const forgotpassword = async(req, res, next) => {
         console.error(err);
         return res.json({ message: err, success: false});
     }
-        
-    
 }
 
 const resetpassword = (req, res) => {
     const id = req.params.id;
-    Forgotpassword.findOne({ where : { id }}).then(forgotpasswordrequest => {
+    FP.findOne({ where : { id }}).then(forgotpasswordrequest => {
         if(forgotpasswordrequest){
             forgotpasswordrequest.update({ active: false});
             res.status(200).send(`<html>
@@ -110,7 +103,7 @@ const updatepassword = (req, res) => {
     try{
         const { newpassword } = req.query;
         const { resetpasswordid } = req.params;
-        Forgotpassword.findOne({ where : { id: resetpasswordid }}).then(resetpasswordrequest => {
+        FP.findOne({ where : { id: resetpasswordid }}).then(resetpasswordrequest => {
             User.findOne({where: { id : resetpasswordrequest.userId}}).then(user => {
                 if(user) {
                     const saltRounds = 10;

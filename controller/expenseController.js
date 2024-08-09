@@ -71,7 +71,7 @@ exports.getExpense = async (req,res,next)=>{
         const filesData = await FilesDownloaded.findAll( {where: {userId: req.user.id }})
 
         totalItems = await Expense.count();
-        const exp =  Expense.getExpense(req.user._id,
+        const exp =  Expense.getExpByUser(req.user._id,
             offset= (page-1) * limit,
             limit= limit,
         );
@@ -85,7 +85,9 @@ exports.getExpense = async (req,res,next)=>{
         console.log('Files Data:', filesData);
 
         const [expenses, totalExpenses ] = await Promise.all([exp, totalExp])
-        return res.json({ expenses, totalExpenses});
+        
+        console.log("all expenses are: ", exp);
+        return res.json({ expenses:exp });
         // res.json({
         //     expenses: expenses,
         //     currentPage: page,
@@ -186,6 +188,7 @@ exports.deleteExpense= async (req,res,next)=>{
         // await t.commit()
         const expenseAmount = await Expense.getExpenseOne(req.params.id);
         const userTotalExpense = await User.findId(expenseAmount[0].userId);
+        console.log("param.id",userTotalExpense);
         userTotalExpense.totalExpense = parseInt(userTotalExpense.totalExpense) - parseInt(expenseAmount[0].amount);
         const update= await User.updateExpense(req.user._id,userTotalExpense.totalExpense)
         console.log("total expense after deletion is",userTotalExpense.totalExpense);

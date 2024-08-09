@@ -8,7 +8,7 @@ const sequelize = require('../util/database');
 exports.showLeaderboard = async (req, res, next) => {
     try{
         const leaderboardofusers = await User.findAll({
-            atributes: ['id', 'username']
+            attributes: ['id', 'username']
         })
         console.log('ye hai leaderboard', leaderboardofusers)
 

@@ -1,36 +1,24 @@
 require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
+import express from 'express';
+import mongoose from 'mongoose';
+import path from 'path';
 
-let mongoConnect = await mongoose.connect('mongodb+srv://prasoon-21:tiAHPUTFYHBhVNpE@cluster0.xqhgxxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+let mongoConnect = mongoose.connect('mongodb+srv://prasoon-21:tiAHPUTFYHBhVNpE@cluster0.xqhgxxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 console.log("connect: ", mongoConnect);
 
-const bodyParser = require('body-parser');
-const path = require('path');
-const fs = require('fs');
-const helmet = require('helmet');
-const compression = require('compression');
-const morgan = require('morgan');
-
 const app = express();
-const cors = require('cors');
+import cors from 'cors';
+import {dailyExpenseRoute} from './routes/dailyExpenseRoute';
+import {premiumRoute} from './routes/premiumRoute';
+import {purchaseRoute} from './routes/purchase';
+import {resetpasswordRoute} from './routes/resetpassword';
+import {userRoute} from './routes/userRoute';
 
-const userRoute = require('./routes/userRoute');
-const dailyExpenseRoute = require('./routes/dailyExpenseRoute');
-
-const purchaseRoute = require('./routes/purchase');
-const premiumRoute = require('./routes/premiumRoute');
-const resetpasswordRoute = require('./routes/resetpassword'); 
-
-//const sequelize = require('./util/database');
-const mongoConnect = require('./util/database').mongoConnect;
-
-
-const User = require('./model/userData');
-const Expense = require('./model/expense');
-const Order = require('./model/orders');
-const Forgotpassword = require('./model/forgotpassword');
-const FilesDownloaded = require('./model/filesdownloaded');
+import {Expense} from './model/expense';
+import {FP} from './model/forgotpassword';
+import {Order} from './model/orders';
+import {User} from './model/userData';
+import {FilesDownloaded} from './model/filesdownloaded';
 
 //console.log(process.env.NODE_ENV)
 
@@ -40,8 +28,8 @@ const FilesDownloaded = require('./model/filesdownloaded');
 // User.hasMany(Order)
 // Order.belongsTo(User);
 
-// User.hasMany(Forgotpassword);
-// Forgotpassword.belongsTo(User);
+// User.hasMany(FP);
+// FP.belongsTo(User);
 
 // User.hasMany(FilesDownloaded);
 // FilesDownloaded.belongsTo(User);
@@ -54,7 +42,7 @@ const FilesDownloaded = require('./model/filesdownloaded');
 app.use(express.json());
 app.use(cors());
 //app.use(helmet());
-app.use(compression())
+//app.use(compression())
 //app.use(morgan('combined', { stream: accessLogStream }));
 
 app.use('/user', userRoute);
@@ -80,8 +68,8 @@ app.use('/password', resetpasswordRoute);
 //     .catch(err => console.log(err))
 
 
-app.listen(process.env.PORT || 7000, () => {
-    console.log('Server is running on port: ', process.env.PORT);
+app.listen(7000, () => {
+    console.log('Server is running on port: 7000');
     console.log("mongoose connected!");
 
     app.get('/', (req, res) => {
