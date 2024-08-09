@@ -139,17 +139,13 @@ exports.addExpense= async (req,res,next)=>
         userId = req.user._id;
         console.log(userId);
         const expense = new Expense(req.user._id, amount, description, category);
-        expense.save().then((exp) => {
-            const totalExpense= +req.user.totalExpense+ +exp.amount;
-            req.user.totalExpense = totalExpense;
-            req.user.save().then((res) => {
-                console.log("total expense: ", totalExpense);
-                console.log("done: ", res);
-            }).catch((err) => {
-                console.log("error", err);
-            })
-        })
-        
+        const exp = await expense.save();
+        const expAmount = await Expense.getExpByUser(userId);
+        const user = await User.findId(userId);
+        console.log(user);
+        user.totalExpense = parseInt(user.totalExpense) + parseInt(amount);
+        const update = await User.updateExpense(userId, user.totalExpense)
+        console.log("Now total amount is: ", user.totalExpense)
         res.status(201).json(expense)
     } catch (error) {
         //await t.rollback()
@@ -188,9 +184,11 @@ exports.deleteExpense= async (req,res,next)=>{
         //     await user.save();
         // }
         // await t.commit()
-        const expenseAmount = await Expense.getExpense(req.params.id);
-        const userTotalExpense = await User.findOne(req.params.id);
-        userTotalExpense.totalExpense = userTotalExpense.totalExpense - expenseAmount.amount;
+        const expenseAmount = await Expense.getExpenseOne(req.params.id);
+        const userTotalExpense = await User.findId(expenseAmount[0].userId);
+        userTotalExpense.totalExpense = parseInt(userTotalExpense.totalExpense) - parseInt(expenseAmount[0].amount);
+        const update= await User.updateExpense(req.user._id,userTotalExpense.totalExpense)
+        console.log("total expense after deletion is",userTotalExpense.totalExpense);
         Expense.destroy(req.params.id).then((response) => {
             res.json({success: true, message:"deleted -> ", response})
         }).catch((err) => {

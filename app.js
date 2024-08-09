@@ -1,5 +1,10 @@
 require('dotenv').config();
 const express = require('express');
+const mongoose = require('mongoose');
+
+let mongoConnect = await mongoose.connect('mongodb+srv://prasoon-21:tiAHPUTFYHBhVNpE@cluster0.xqhgxxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+console.log("connect: ", mongoConnect);
+
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
@@ -74,13 +79,13 @@ app.use('/password', resetpasswordRoute);
 //     })
 //     .catch(err => console.log(err))
 
-mongoConnect(() => {
-    app.listen(process.env.PORT || 7000, () => {
-        console.log('Server is running on port: ', process.env.PORT);
 
-        app.get('/', (req, res) => {
-            res.sendFile(path.join(__dirname, "views", "login.html"));
-    
-        })
+app.listen(process.env.PORT || 7000, () => {
+    console.log('Server is running on port: ', process.env.PORT);
+    console.log("mongoose connected!");
+
+    app.get('/', (req, res) => {
+        res.sendFile(path.join(__dirname, "views", "login.html"));
+
     })
 })

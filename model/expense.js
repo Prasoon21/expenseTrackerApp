@@ -1,67 +1,71 @@
-const getDb = require('../util/database').getDb;
-const mongo = require('mongodb');
-class Expense{
-    constructor(amount, description, category){
-        this.amount = amount;
-        this.description = description;
-        this.category = category;
-    }
+import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
 
-    save(){
-        const db = getDb();
-        return db.collection('expense')
-            .insertOne(this)
-            .then((result) => {
-                console.log(result)
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-    }
+const ExpenseSchema = new mongoose.Schema({
+    userId: ObjectId,
+    amount: Number,
+    description: String,
+    category: String
+})
 
-    static getExpense(id, offset, limit){
-        const db = getDb();
-        return db.collection('expense').find({_id:new mongo.ObjectId(id)}).skip(+offset).limit(+limit).toArray().then((expense) => {
-            console.log("expenses are: ", expense);
-        }).catch((err) => {
-            console.log("error: ", err);
 
-        })
-    }
+export const Expense = mongoose.model('expense', ExpenseSchema);
 
-    static ifPremiumUser(id){
-        const db = getDb();
-        return db.collection('expense').find({_id: new mongo.ObjectId(id)}).toArray().then((expense) => {
-            if(expense.isPremiumUser){
-                return true;
-            }
-            return false;
-        }).catch((err) => {
-            console.log("error: ", err);
-        })
-    }
+//     save(){
+//         const db = getDb();
+//         return db.collection('expense')
+//             .insertOne(this)
+//             .then((result) => {
+//                 console.log(result)
+//             })
+//             .catch((err) => {
+//                 console.log(err);
+//             })
+//     }
 
-    static destroy(id){
-        const db = getDb();
-        return db.collection('expense').remove(id).then((res) => {
-            console.log("deleted: ", res);
-        }).catch((err) => {
-            console.log("error: ", err);
-        })
-    }
+//     static getExpense(id, offset, limit){
+//         const db = getDb();
+//         return db.collection('expense').find({_id:new mongo.ObjectId(id)}).skip(+offset).limit(+limit).toArray().then((expense) => {
+//             console.log("expenses are: ", expense);
+//         }).catch((err) => {
+//             console.log("error: ", err);
 
-    static countExpenses(id){
-        const db = getDb();
-        return db.collection('expense').count({userId: id}).then((res) => {
-            console.log("count expenses: ", res);
-            return res;
-        }).catch((err) => {
-            console.log(err);
-        })
-    }
-}
+//         })
+//     }
 
-module.exports = Expense;
+//     static ifPremiumUser(id){
+//         const db = getDb();
+//         return db.collection('expense').find({_id: new mongo.ObjectId(id)}).toArray().then((expense) => {
+//             if(expense.isPremiumUser){
+//                 return true;
+//             }
+//             return false;
+//         }).catch((err) => {
+//             console.log("error: ", err);
+//         })
+//     }
+
+//     static destroy(id){
+//         const db = getDb();
+//         return db.collection('expense').remove(id).then((res) => {
+//             console.log("deleted: ", res);
+//         }).catch((err) => {
+//             console.log("error: ", err);
+//         })
+//     }
+
+//     static countExpenses(id){
+//         const db = getDb();
+//         return db.collection('expense').count({userId: id}).then((res) => {
+//             console.log("count expenses: ", res);
+//             return res;
+//         }).catch((err) => {
+//             console.log(err);
+//         })
+//     }
+// }
+
+// module.exports = Expense;
 
 
 
