@@ -2,7 +2,10 @@ import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 
 const ExpenseSchema = new mongoose.Schema({
-    userId: ObjectId,
+    userId: {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"user"
+    },
     amount: Number,
     description: String,
     category: String

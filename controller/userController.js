@@ -23,7 +23,7 @@ exports.loginUser = async (req, res, next) => {
         }
         
         const exist_email = await User.find({emailId:emailId});
-        console.log("existing email: ", exist_email[0].id);
+        console.log("existing email: ", exist_email[0]);
         
 
         // const existingUser = await User.findOne({ 
@@ -37,8 +37,8 @@ exports.loginUser = async (req, res, next) => {
         if(exist_email == null){
             res.json({success:false, status:404, message:"User not found ... Please signup first"});
         } else{
-            userId = exist_email._id;
-            bcrypt.compare(passId, exist_email.password, (err,result) => {
+            userId = exist_email[0]._id;
+            bcrypt.compare(passId, exist_email[0].password, (err,result) => {
                 if(err){
                     res.json({success:false, message:"Something went wrong"});
                 } else if(result == true){
@@ -92,9 +92,9 @@ exports.postUser = async (req, res, next) => {
         // })
 
         
-        const existingUser = await User.findOne(emailId);
+        const existingUser = await User.find({emailId:emailId});
         console.log('Existing User: ', existingUser);
-        if (existingUser) {
+        if (existingUser==[]) {
             console.error("Email already in use");
             return res.status(400).json({ error: "Email already in use", message: "Email already in use" });
         }
@@ -108,8 +108,8 @@ exports.postUser = async (req, res, next) => {
             // });
             //const newUser = new User(username, emailId, hash);
             const newUser = new User ({name: username, email:emailId, password: hash, ispremiumuser:false, totalExpense:0 });
-            await newUser.save();
-            console.log("New user created : ", newUser);
+            const newUserCreated = await newUser.save();
+            console.log("New user created : ", newUserCreated);
             res.status(201).json({message: 'Successfully Create new user'});
         })
         

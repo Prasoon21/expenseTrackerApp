@@ -20,13 +20,15 @@ const forgotpassword = async(req, res, next) => {
     try{
         const emailId = req.body.emailId;
         console.log('entered email:', emailId);
-        const user = await User.findOne(emailId);
+        const user = await User.find({emailId:emailId});
         if(user){
             const id = uuid.v4();
-            user.createFP({ id, active: true })
-                .catch(err => {
-                    throw new Error(err)
-                })
+            const fp = new FP({userId:req.user._id, isActive:true })
+            await fp.save();
+            // user.createFP({ id, active: true })
+            //     .catch(err => {
+            //         throw new Error(err)
+            //     })
             
             const client = Sib.ApiClient.instance;
             const apiKey = client.authentications['api-key'];
@@ -76,7 +78,7 @@ const forgotpassword = async(req, res, next) => {
 
 const resetpassword = (req, res) => {
     const id = req.params.id;
-    FP.findOne({ where : { id }}).then(forgotpasswordrequest => {
+    FP.find({ _id : id }).then(forgotpasswordrequest => {
         if(forgotpasswordrequest){
             forgotpasswordrequest.update({ active: false});
             res.status(200).send(`<html>
@@ -103,7 +105,7 @@ const updatepassword = (req, res) => {
     try{
         const { newpassword } = req.query;
         const { resetpasswordid } = req.params;
-        FP.findOne({ where : { id: resetpasswordid }}).then(resetpasswordrequest => {
+        FP.find({ where : { id: resetpasswordid }}).then(resetpasswordrequest => {
             User.findOne({where: { id : resetpasswordrequest.userId}}).then(user => {
                 if(user) {
                     const saltRounds = 10;

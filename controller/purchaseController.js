@@ -32,10 +32,10 @@ exports.purchasepremium = async (req, res) => {
 
 exports.updateTransactionStatus = async(req, res, next) => {
     try {
-        const { payment_id, order_id, payment_status } = req.body;
+        const { payment_id, order_id } = req.body;
         const userId = req.user.id
 
-        const order = await Order.findOne(order_id);
+        const order = await Order.find({_id:order_id});
 
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found" });

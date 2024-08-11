@@ -3,7 +3,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import path from 'path';
 
-let mongoConnect = mongoose.connect('mongodb+srv://prasoon-21:tiAHPUTFYHBhVNpE@cluster0.xqhgxxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+let mongoConnect = await mongoose.connect('mongodb+srv://prasoon-21:tiAHPUTFYHBhVNpE@cluster0.xqhgxxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 console.log("connect: ", mongoConnect);
 
 const app = express();

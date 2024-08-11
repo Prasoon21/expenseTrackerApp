@@ -138,17 +138,17 @@ exports.addExpense= async (req,res,next)=>
         // //await t.commit();
         // console.log('updated success');
 
-        userId = req.user._id;
+        userId = req.user[0]._id;
         console.log(userId);
-        const expense = new Expense(req.user._id, amount, description, category);
+        const expense = new Expense({userId:req.user[0]._id, amount:amount, description:description, category:category});
         const exp = await expense.save();
-        const expAmount = await Expense.getExpByUser(userId);
-        const user = await User.findId(userId);
-        console.log(user);
-        user.totalExpense = parseInt(user.totalExpense) + parseInt(amount);
-        const update = await User.updateExpense(userId, user.totalExpense)
-        console.log("Now total amount is: ", user.totalExpense)
-        res.status(201).json(expense)
+        const expAmount = await Expense.find({userId: userId});
+        const user = await User.find({_id:userId});
+        console.log("user", user[0]);
+        user[0].totalExpense = parseInt(user[0].totalExpense) + parseInt(amount);
+        const update = await User.updateOne({_id:userId, totalExpense:user[0].totalExpense});
+        console.log("Now total amount is: ", user[0].totalExpense)
+        res.status(201).json(update)
     } catch (error) {
         //await t.rollback()
         console.log(error,JSON.stringify(error))
