@@ -107,9 +107,9 @@ exports.postUser = async (req, res, next) => {
             //     passId: hash
             // });
             //const newUser = new User(username, emailId, hash);
-            const newUser = new User ({name: username, email:emailId, password: hash, ispremiumuser:false, totalExpense:0 });
-            const newUserCreated = await newUser.save();
-            console.log("New user created : ", newUserCreated);
+            const newUser = User.create({name: username, email:emailId, password: hash, ispremiumuser:false, totalExpense:0 });
+            //const newUserCreated = await newUser.save();
+            console.log("New user created : ", newUser);
             res.status(201).json({message: 'Successfully Create new user'});
         })
         

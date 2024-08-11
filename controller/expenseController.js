@@ -138,16 +138,16 @@ exports.addExpense= async (req,res,next)=>
         // //await t.commit();
         // console.log('updated success');
 
-        userId = req.user[0]._id;
+        userId = req.user._id;
         console.log(userId);
-        const expense = new Expense({userId:req.user[0]._id, amount:amount, description:description, category:category});
-        const exp = await expense.save();
+        const expense = Expense.create({userId:req.user._id, amount:amount, description:description, category:category});
+        //const exp = await expense.save();
         const expAmount = await Expense.find({userId: userId});
-        const user = await User.find({_id:userId});
-        console.log("user", user[0]);
-        user[0].totalExpense = parseInt(user[0].totalExpense) + parseInt(amount);
-        const update = await User.updateOne({_id:userId, totalExpense:user[0].totalExpense});
-        console.log("Now total amount is: ", user[0].totalExpense)
+        const user = await User.findById(userId);
+        console.log("user", user);
+        const newTotalExpense = parseInt(user.totalExpense) + parseInt(amount);
+        const update = await User.findOneAndUpdate({_id:userId}, {totalExpense:newTotalExpense}, {new: true});
+        console.log("Now total amount is: ", user.totalExpense)
         res.status(201).json(update)
     } catch (error) {
         //await t.rollback()
@@ -186,13 +186,15 @@ exports.deleteExpense= async (req,res,next)=>{
         //     await user.save();
         // }
         // await t.commit()
-        const expenseAmount = await Expense.getExpenseOne(req.params.id);
-        const userTotalExpense = await User.findId(expenseAmount[0].userId);
-        console.log("param.id",userTotalExpense);
-        userTotalExpense.totalExpense = parseInt(userTotalExpense.totalExpense) - parseInt(expenseAmount[0].amount);
-        const update= await User.updateExpense(req.user._id,userTotalExpense.totalExpense)
-        console.log("total expense after deletion is",userTotalExpense.totalExpense);
-        Expense.destroy(req.params.id).then((response) => {
+        const expenseAmount = await Expense.findById(req.params.id);
+        console.log("?: ", expenseAmount);
+        const userTotalExpense = await User.findById(expenseAmount.userId);
+        console.log("param.id",userTotalExpense.totalExpense);
+        const newExpense = parseInt(userTotalExpense.totalExpense) - parseInt(expenseAmount.amount);
+        //const update= await User.updateExpense(req.user._id,userTotalExpense.totalExpense)
+        console.log("total expense after deletion is",newExpense);
+        await User.updateOne({_id : req.user._id},{totalExpense:newExpense},{new : true});
+        Expense.deleteOne({_id: req.params.id}).then((response) => {
             res.json({success: true, message:"deleted -> ", response})
         }).catch((err) => {
             console.log(err);

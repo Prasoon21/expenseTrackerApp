@@ -35,16 +35,18 @@ exports.updateTransactionStatus = async(req, res, next) => {
         const { payment_id, order_id } = req.body;
         const userId = req.user.id
 
-        const order = await Order.find({_id:order_id});
+        const order = await Order.findOne({order_id});
 
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found" });
         }
 
-        await order.update({ paymentid: payment_id, status: 'SUCCESSFUL' });
+        order.payment_id = payment_id;
+        order.status = "successful";
+        //await order.update({ paymentid: payment_id, status: 'SUCCESSFUL' });
 
-        await req.user.update({ ispremiumuser: true });
-
+        //await req.user.update({ ispremiumuser: true });
+        const updated=await User.findOneAndUpdate({_id:userId},{$set:{isPremiumUser:true}});
         res.status(202).json({ success: true, message: "Transaction Successful", token: loginController.generateAccessToken(userId, undefined, true) });
 
         // if (order.status === 'PENDING') {

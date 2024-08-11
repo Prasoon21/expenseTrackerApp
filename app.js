@@ -14,11 +14,11 @@ import {purchaseRoute} from './routes/purchase';
 import {resetpasswordRoute} from './routes/resetpassword';
 import {userRoute} from './routes/userRoute';
 
-import {Expense} from './model/expense';
-import {FP} from './model/forgotpassword';
-import {Order} from './model/orders';
-import {User} from './model/userData';
-import {FilesDownloaded} from './model/filesdownloaded';
+// import {Expense} from './model/expense';
+// import {FP} from './model/forgotpassword';
+// import {Order} from './model/orders';
+// import {User} from './model/userData';
+// import {FilesDownloaded} from './model/filesdownloaded';
 
 //console.log(process.env.NODE_ENV)
 

@@ -14,7 +14,7 @@ const middleware = async (req, res, next) => {
 
         // })
         // .catch(err => { throw new Error(err) })
-        req.user = await User.find({_id:user.userId});
+        req.user = await User.findById(user.userId);
         console.log('user--> ', req.user);
         next();
     } catch (err){
