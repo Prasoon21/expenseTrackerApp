@@ -1,18 +1,17 @@
-import { ObjectId } from 'mongodb';
-import mongoose from 'mongoose';
+const mongodb = require('mongodb');
+const mongoose = require('mongoose');
+const User = require('../model/userData');
 
-const ExpenseSchema = new mongoose.Schema({
-    userId: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"user"
-    },
+const expenseSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     amount: Number,
     description: String,
+    date: { type: Date, default: Date.now() },
     category: String
 })
 
-export const Expense = mongoose.model('expense', ExpenseSchema);
-
+const Expense = mongoose.model('Expense', expenseSchema)
+module.exports = Expense;
 //     save(){
 //         const db = getDb();
 //         return db.collection('expense')

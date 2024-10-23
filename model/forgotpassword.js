@@ -36,11 +36,11 @@
 
 // module.exports = FP;
 
-import { ObjectId } from 'mongodb';
-import mongoose from 'mongoose';
+const ObjectId = require('mongodb');
+const mongoose = require('mongoose');
 const FPSchema = new mongoose.Schema({
-    userId: ObjectId,
+    userId: Number,
     isActive: Boolean
 })
 
-export const FP = mongoose.model('fp', FPSchema);
+module.exports = FPSchema;

@@ -4,8 +4,8 @@ const Sib = require('sib-api-v3-sdk');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
-import {User} from '../model/userData';
-import {FP} from '../model/forgotpassword';
+const User = require('../model/userData');
+const {FP} = require('../model/forgotpassword');
 
 const forgotForm = async(req, res, next) => {
     try{

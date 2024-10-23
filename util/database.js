@@ -12,7 +12,7 @@ const mongoClient = mongo.MongoClient;
 let _db;
 
 const mongoConnect = (callback) => {
-    mongoClient.connect('mongodb+srv://prasoon-21:tiAHPUTFYHBhVNpE@cluster0.xqhgxxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+    mongoClient.connect('mongodb+srv://prasoon-21:tiAHPUTFYHBhVNpE@cluster0.xqhgxxo.mongodb.net/')
     .then((client) => {
         _db = client.db();
         callback();

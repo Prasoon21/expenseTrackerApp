@@ -16,6 +16,6 @@ route.get('/login', userController.getLogin);
 route.post('/signup', userController.postUser);
 route.get('/signup', userController.getSignUp);
 
-route.get('/download', authenticateMiddleware.authenticate, expenseController.downloadexpense);
+route.get('/download', authenticateMiddleware.middleware, expenseController.downloadexpense);
 
 module.exports = route;

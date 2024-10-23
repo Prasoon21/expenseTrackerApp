@@ -40,14 +40,14 @@
 
 // module.exports = Order;
 
-import { ObjectId } from "mongodb";
-import mongoose from "mongoose";
+const ObjectId = require("mongodb");
+const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema({
-    userId: ObjectId,
+    userId: Number,
     paymentId: String,
     orderId:String,
     status: String
 })
 
-export const Order = mongoose.model('order', OrderSchema);
+module.exports = OrderSchema;

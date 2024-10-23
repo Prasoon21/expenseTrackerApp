@@ -1,13 +1,13 @@
-import path from 'path';
-import rootDir from '../util/path';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import userController from './userController';
+const path = require('path');
+const rootDir = require('../util/path');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const userController = require('./userController');
 let userId = 0;
-import User from "../model/userData";
+const User = require("../model/userData");
 
 exports.generateAccessToken = (id, name, ispremiumuser) => {
-    return jwt.sign({ userId: id, name: name, ispremiumuser}, 'r@nd0mlyG3n3r@tedK3yW!thSpec!alCh@ract3rs');
+    return jwt.sign({ userId: id, name: name, ispremiumuser}, process.env.TOKEN_SECRET);
 };
 
 exports.loginUser = async (req, res, next) => {
@@ -22,8 +22,8 @@ exports.loginUser = async (req, res, next) => {
             return res.status(400).json({ error: "EmailId is missing", message: "EmailId is missing" });
         }
         
-        const exist_email = await User.find({emailId:emailId});
-        console.log("existing email: ", exist_email[0]);
+        const exist_email = await User.findOne({emailId:emailId});
+        console.log("existing email: ", exist_email);
         
 
         // const existingUser = await User.findOne({ 
@@ -34,15 +34,17 @@ exports.loginUser = async (req, res, next) => {
         // console.log(existingUser.passId);
         // console.log(passId);
         //console.log('Existing User: ', existingUser);
-        if(exist_email == null){
+        if(!exist_email){
             res.json({success:false, status:404, message:"User not found ... Please signup first"});
         } else{
-            userId = exist_email[0]._id;
-            bcrypt.compare(passId, exist_email[0].password, (err,result) => {
+            userId = exist_email._id;
+            bcrypt.compare(passId, exist_email.passId, (err,result) => {
                 if(err){
                     res.json({success:false, message:"Something went wrong"});
-                } else if(result == true){
-                    return res.json({success:true, message:"User login successfull", token: userController.generateAccessToken(userId, exist_email.ispremiumuser)});
+                } else if(result === true){
+                    const generatedToken = userController.generateAccessToken(userId, exist_email.isPremiumUser);
+                    console.log("Generated token: ", generatedToken);
+                    return res.json({success:true, message:"User login successfull", token: generatedToken});
                 } else{
                     res.status(403).json({success:false, message: "incorrect password"});
                 }
@@ -94,24 +96,25 @@ exports.postUser = async (req, res, next) => {
         
         const existingUser = await User.find({emailId:emailId});
         console.log('Existing User: ', existingUser);
-        if (existingUser==[]) {
+        if (existingUser.length > 0) {
             console.error("Email already in use");
             return res.status(400).json({ error: "Email already in use", message: "Email already in use" });
         }
     
-        bcrypt.hash(passId, 10, async (err, hash) => {
-            console.log(err);
-            // await User.create({
-            //     username: username,
-            //     emailId: emailId,
-            //     passId: hash
-            // });
-            //const newUser = new User(username, emailId, hash);
-            const newUser = User.create({name: username, email:emailId, password: hash, ispremiumuser:false, totalExpense:0 });
-            //const newUserCreated = await newUser.save();
-            console.log("New user created : ", newUser);
-            res.status(201).json({message: 'Successfully Create new user'});
-        })
+        const hashedPassword = await bcrypt.hash(passId, 10);
+
+        const newUser = new User({
+            username: username,
+            emailId: emailId,
+            passId: hashedPassword,
+            isPremiumUser: false,
+            totalExpense: 0
+        });
+
+        const savedUser = await newUser.save();
+        console.log(" New User Created: ", savedUser);
+
+        res.status(201).json({ message: 'Successfully created new user', user: savedUser });
         
 
         

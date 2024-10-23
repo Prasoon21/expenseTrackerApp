@@ -3,9 +3,9 @@ const route = express.Router();
 const userAuthenticate = require('../middleware/auth');
 const expenseController = require('../controller/expenseController');
 
-route.get('/getExpense',userAuthenticate.authenticate , expenseController.getExpense);
+route.get('/getExpense', userAuthenticate.middleware, expenseController.getExpense);
 route.get('/dashboard', expenseController.getHtml);
-route.post('/',userAuthenticate.authenticate, expenseController.addExpense);
+route.post('/',userAuthenticate.middleware, expenseController.addExpense);
 route.delete('/deleteExpense/:id', expenseController.deleteExpense);
 
 

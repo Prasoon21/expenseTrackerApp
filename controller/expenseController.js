@@ -5,6 +5,7 @@ const sequelize = require('../util/database');
 const User = require('../model/userData');
 const AWS = require('aws-sdk');
 const FilesDownloaded = require('../model/filesdownloaded');
+const { response } = require('express');
 let userId = 0;
 
 
@@ -66,39 +67,39 @@ exports.getExpense = async (req,res,next)=>{
     try{
         const page = parseInt(req.query.page) || 1; 
         const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
 
-        let totalItems;
-        const filesData = await FilesDownloaded.findAll( {where: {userId: req.user.id }})
+        console.log("user");
+        userId = req.user._id;
 
-        totalItems = await Expense.count();
-        const exp =  Expense.getExpByUser(req.user._id,
-            offset= (page-1) * limit,
-            limit= limit,
-        );
+        // const filesData = await FilesDownloaded.findAll( {where: {userId: userId }})
+        console.log("user id from request: ", typeof(userId));
+        console.log("Query: ", { userId: userId });
 
-        const totalExp = await Expense.countExpenses(req.user._id);
-        console.log("totalexp: ", totalExp);
+        const totalItems = await Expense.countDocuments({ userId: userId });
 
-        console.log('User ID:', req.user.id);
-        console.log('Limit:', limit);
-        console.log('Expenses:', expenses);
-        console.log('Files Data:', filesData);
+        const expenses = await Expense.find({userId: userId})
+            .sort({ date: -1 })
+            .skip(skip)
+            .limit(limit);
 
-        const [expenses, totalExpenses ] = await Promise.all([exp, totalExp])
-        
-        console.log("all expenses are: ", exp);
-        return res.json({ expenses:exp });
-        // res.json({
-        //     expenses: expenses,
-        //     currentPage: page,
-        //     hasNextPage: limit * page < totalItems,
-        //     nextPage: page + 1,
-        //     hasPreviousPage: page > 1,
-        //     previousPage: page-1,
-        //     lastPage: Math.ceil(totalItems / limit),
-        //     filesData: filesData,
-        //     limit: limit
-        // });
+        console.log("expenses through get Expense: ", expenses);
+        const user = await User.findById(userId);
+        console.log("user found: ", user);
+
+        if(!user){
+            return res.status(404).json({ message: 'User not Found' });
+        }
+
+        console.log("isPremium USer: ", user.isPremiumUser);
+
+        return res.status(200).json({
+            expenses,
+            currentPage: page,
+            totalPages: Math.ceil(totalItems/limit),
+            totalItems,
+            isPremiumUser: user.isPremiumUser
+        });
     } catch(err){
         console.log(err);
         res.status(500).json({ error: 'Internal server error' });
@@ -117,44 +118,42 @@ exports.addExpense= async (req,res,next)=>
     // console.log(req.body.amount);
     if(!req.body.amount||!req.body.description||!req.body.category)
     {
-        //console.log(req.body.amount);
         console.log('missing expense req fields');
         return res.sendStatus(500)
     }
 
     try {
         const { amount, description, category} = req.body;
+        
+        const date = req.body.date || new Date();
     
-    
-        console.log(amount,description,category);
-
-        // const data=await Expense.create({
-        //     amount:amount,
-        //     description:description,
-        //     category:category,
-        //     userId:req.user.id,
-        //  });
-        // //const expense = await Expense.create({ userId, amount, description, category });
-        // //await t.commit();
-        // console.log('updated success');
+        console.log("Amount: ", amount, "Description: ", description, "Category: ",category, "Date: ", date);
 
         userId = req.user._id;
-        console.log(userId);
-        const expense = Expense.create({userId:req.user._id, amount:amount, description:description, category:category});
-        //const exp = await expense.save();
-        const expAmount = await Expense.find({userId: userId});
+        console.log("user id in add expense :", userId);
+        const expense = await Expense.create({
+            userId: userId, 
+            amount: amount, 
+            description: description, 
+            date: date, 
+            category: category
+        });
+
+        console.log("expense after creation: ", expense);
         const user = await User.findById(userId);
         console.log("user", user);
         const newTotalExpense = parseInt(user.totalExpense) + parseInt(amount);
-        const update = await User.findOneAndUpdate({_id:userId}, {totalExpense:newTotalExpense}, {new: true});
-        console.log("Now total amount is: ", user.totalExpense)
-        res.status(201).json(update)
-    } catch (error) {
-        //await t.rollback()
-        console.log(error,JSON.stringify(error))
+        const update = await User.findOneAndUpdate(
+            { _id:userId }, 
+            { totalExpense: newTotalExpense }, 
+            { new: true }
+        );
 
-        res.status(501).json({error})
-    
+        console.log("Now total amount is: ", newTotalExpense)
+        res.status(201).json({ expense, user: update})
+    } catch (error) {
+        console.log(error,JSON.stringify(error))
+        res.status(500).json({ error: 'Internal Server Error' })
     }
 
 };

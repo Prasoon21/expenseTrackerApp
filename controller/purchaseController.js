@@ -1,6 +1,6 @@
-import Razorpay from 'razorpay';
-import Order from '../model/orders';
-import loginController from './userController';
+const Razorpay = require('razorpay');
+const Order = require('../model/orders');
+const loginController = require('./userController');
 
 exports.purchasepremium = async (req, res) => {
     try{

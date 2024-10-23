@@ -69,13 +69,15 @@
 // module.exports = User;
 
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
     username:String,
-    emailId:String,
+    emailId:String,  
     passId:String,
-    isPremiumUser:Boolean,
-    totalExpense:Number
+    isPremiumUser:{ type: Boolean, default:false },
+    totalExpense: { type: Number, default:0 }
 })
 
-export const User = mongoose.model('user', UserSchema);
+const User = mongoose.model('User', UserSchema);
+
+module.exports = User;
